@@ -1,0 +1,567 @@
+/* ── Dark Theme (default) ─────────────────────────────────────── */
+html.theme-dark {
+    --bg-primary:    #1a1a2e;
+    --bg-secondary:  #16213e;
+    --bg-tertiary:   #0f3460;
+    --text-primary:  #e0e0e0;
+    --text-secondary:#aaa;
+    --text-muted:    #666;
+    --border-color:  #0f3460;
+    --accent:        #e94560;
+    --accent-hover:  #c73652;
+    --success:       #57ffb0;
+    --warning:       #ffc857;
+    --info:          #57c8ff;
+}
+
+/* ── Light Theme — soft blue-gray palette ─────────────────────── */
+html.theme-light {
+    --bg-primary:    #eef0f5;
+    --bg-secondary:  #e0e4ee;
+    --bg-tertiary:   #cdd2e0;
+    --text-primary:  #1a1a2e;
+    --text-secondary:#334;
+    --text-muted:    #556;
+    --border-color:  #b0b8cc;
+    --accent:        #c0203a;
+    --accent-hover:  #9a1830;
+    --success:       #006644;
+    --warning:       #8a5a00;
+    --info:          #004e99;
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+html, body {
+    background: var(--bg-primary)   !important;
+    color:      var(--text-primary) !important;
+    transition: background 0.25s, color 0.25s;
+}
+
+/* ── Navbar ───────────────────────────────────────────────────── */
+.navbar, nav.navbar {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+.logo { color: var(--accent) !important; }
+
+/* ── Cards ────────────────────────────────────────────────────── */
+.card {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+.card-title { color: var(--accent) !important; }
+
+/* ── Inputs ───────────────────────────────────────────────────── */
+input[type=text],
+input[type=email],
+input[type=password],
+input[type=date],
+input[type=color],
+select,
+textarea {
+    background:   var(--bg-primary)   !important;
+    color:        var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent) !important;
+    outline: none !important;
+}
+input::placeholder { color: var(--text-muted) !important; }
+label { color: var(--text-secondary) !important; }
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.btn-outline {
+    color:        var(--text-secondary) !important;
+    border-color: var(--border-color)   !important;
+    background:   transparent           !important;
+}
+.btn-outline:hover {
+    border-color: var(--accent) !important;
+    color:        var(--accent) !important;
+}
+.btn-primary {
+    background: var(--accent)       !important;
+    color:      #ffffff              !important;
+    border:     none                 !important;
+}
+.btn-primary:hover { background: var(--accent-hover) !important; }
+
+/* ── Tables ───────────────────────────────────────────────────── */
+table { color: var(--text-primary) !important; }
+thead tr { background: var(--bg-tertiary) !important; }
+thead th {
+    color:        var(--text-secondary) !important;
+    border-color: var(--border-color)   !important;
+}
+tbody tr { border-color: var(--border-color) !important; }
+tbody tr:hover { background: var(--bg-tertiary) !important; }
+tbody td {
+    color:        var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+tbody tr:nth-child(even) { background: var(--bg-secondary) !important; }
+
+/* ── Stat cards ───────────────────────────────────────────────── */
+.stat-card, .stat {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+.stat .num, .stat-card .number { color: var(--accent) !important; }
+.stat .lbl, .stat-card .label  { color: var(--text-muted) !important; }
+
+/* ── Thread cards ─────────────────────────────────────────────── */
+.thread-card {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+.thread-card:hover  { border-color: var(--accent) !important; }
+.thread-email       { color: var(--text-primary)   !important; }
+.thread-preview,
+.thread-time        { color: var(--text-muted)     !important; }
+
+/* ── Badges ───────────────────────────────────────────────────── */
+.badge-admin        { background: var(--accent)  !important; color: #fff !important; }
+.unread-badge       { background: var(--accent)  !important; color: #fff !important; }
+.role-teacher {
+    background:   rgba(0,78,153,0.12) !important;
+    border-color: var(--info)         !important;
+    color:        var(--info)         !important;
+}
+.role-admin {
+    background:   rgba(192,32,58,0.1) !important;
+    border-color: var(--accent)       !important;
+    color:        var(--accent)       !important;
+}
+
+/* ── Status / labels ──────────────────────────────────────────── */
+.subtitle, .info, .user,
+.card-date, .section-title,
+.danger-text, .user-label { color: var(--text-muted) !important; }
+
+h1, h2 { color: var(--text-primary) !important; }
+.page-header h1 { color: var(--text-primary) !important; }
+
+/* ── Error / success messages ─────────────────────────────────── */
+.error-msg {
+    background:   rgba(192,32,58,0.08) !important;
+    border-color: var(--accent)         !important;
+    color:        var(--accent)         !important;
+}
+.success-msg {
+    background:   rgba(0,102,68,0.08) !important;
+    border-color: var(--success)       !important;
+    color:        var(--success)       !important;
+}
+.msg.error {
+    background:   rgba(192,32,58,0.08) !important;
+    border-color: var(--accent)         !important;
+    color:        var(--accent)         !important;
+}
+.msg.success {
+    background:   rgba(0,102,68,0.08) !important;
+    border-color: var(--success)       !important;
+    color:        var(--success)       !important;
+}
+
+/* ── Avatar ───────────────────────────────────────────────────── */
+.avatar { background: var(--accent) !important; color: #fff !important; }
+
+/* ── Danger zone ──────────────────────────────────────────────── */
+.danger-zone { border-color: var(--accent) !important; }
+
+/* ── Validation errors ────────────────────────────────────────── */
+.validation-error { color: var(--accent) !important; }
+
+/* ════════════════════════════════════════════════════════════════
+   EDITOR PAGE
+   ════════════════════════════════════════════════════════════════ */
+
+/* Toolbar + bars */
+html.theme-light #toolbar,
+html.theme-light #formula-bar,
+html.theme-light #search-bar,
+html.theme-light #legend,
+html.theme-light #tab-bar,
+html.theme-light #stats-panel,
+html.theme-light .stats-toggle,
+html.theme-light #stats-content,
+html.theme-light #spreadsheet-container {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Toolbar buttons */
+html.theme-light .tool-btn {
+    color:      var(--text-secondary) !important;
+    background: transparent           !important;
+    border:     1px solid transparent !important;
+}
+html.theme-light .tool-btn:hover {
+    background:   var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+html.theme-light .tool-btn.active {
+    background:   var(--accent) !important;
+    border-color: var(--accent) !important;
+    color:        #ffffff       !important;
+}
+html.theme-light .tool-divider { background: var(--border-color) !important; }
+html.theme-light #toolbar select {
+    background:   var(--bg-primary)   !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+html.theme-light .tool-color-label {
+    border-color: transparent !important;
+}
+html.theme-light .tool-color-label:hover {
+    background:   var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .tool-color-label .color-icon {
+    color: var(--text-secondary) !important;
+}
+
+/* Formula bar */
+html.theme-light #cell-address {
+    background:   var(--bg-primary)   !important;
+    border-color: var(--border-color) !important;
+    color:        var(--accent)       !important;
+}
+html.theme-light #formula-input {
+    color:      var(--text-primary) !important;
+    background: transparent         !important;
+}
+html.theme-light #fx-label        { color: var(--accent)       !important; }
+html.theme-light #formula-divider { background: var(--border-color) !important; }
+
+/* Search bar */
+html.theme-light .search-wrap {
+    background:   var(--bg-primary)   !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light #search-input {
+    color:      var(--text-primary) !important;
+    background: transparent         !important;
+}
+html.theme-light #search-input::placeholder { color: var(--text-muted) !important; }
+html.theme-light .search-icon  { color: var(--text-muted) !important; }
+html.theme-light .search-clear { color: var(--text-muted) !important; }
+html.theme-light .search-info  { color: var(--text-muted) !important; }
+
+/* Legend */
+html.theme-light #legend      { color: var(--text-muted)   !important; }
+html.theme-light .legend-item { color: var(--text-secondary) !important; }
+
+/* Tab bar */
+html.theme-light .tab-item {
+    color:        var(--text-muted)  !important;
+    border-color: var(--border-color) !important;
+    background:   transparent         !important;
+}
+html.theme-light .tab-item:hover {
+    background: var(--bg-tertiary) !important;
+    color:      var(--text-primary) !important;
+}
+html.theme-light .tab-item.active {
+    background:   var(--bg-primary)   !important;
+    color:        var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .tab-close { color: var(--text-muted) !important; }
+html.theme-light .tab-close:hover {
+    color:      var(--accent)           !important;
+    background: rgba(192,32,58,0.1)     !important;
+}
+html.theme-light .tab-dup { color: var(--text-muted) !important; }
+html.theme-light .tab-dup:hover {
+    color:      var(--info)            !important;
+    background: rgba(0,78,153,0.1)     !important;
+}
+html.theme-light .tab-add-btn {
+    border-color: var(--border-color) !important;
+    color:        var(--text-muted)   !important;
+    background:   transparent          !important;
+}
+html.theme-light .tab-add-btn:hover {
+    border-color: var(--accent) !important;
+    color:        var(--accent) !important;
+}
+html.theme-light .tab-rename-input {
+    background:   transparent         !important;
+    color:        var(--text-primary) !important;
+    border-color: var(--accent)       !important;
+}
+
+/* Stats panel */
+html.theme-light .stat-item {
+    background:   var(--bg-primary)   !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .stat-value  { color: var(--accent)     !important; }
+html.theme-light .stat-label  { color: var(--text-muted) !important; }
+html.theme-light .stats-hint  { color: var(--text-muted) !important; }
+html.theme-light .stats-toggle {
+    color: var(--text-muted) !important;
+}
+html.theme-light #stats-toggle-icon { color: var(--text-muted) !important; }
+
+/* Sheet title */
+html.theme-light #sheetTitle {
+    background:   var(--bg-primary)   !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+
+/* Status bar */
+html.theme-light .status {
+    color:        var(--text-muted) !important;
+    border-color: transparent       !important;
+}
+html.theme-light .status.saved {
+    color:        var(--success) !important;
+    border-color: var(--success) !important;
+    background:   rgba(0,102,68,0.06) !important;
+}
+html.theme-light .status.unsaved {
+    color:        var(--warning) !important;
+    border-color: transparent    !important;
+}
+
+/* Toast */
+html.theme-light .toast {
+    background: var(--success) !important;
+    color:      #ffffff        !important;
+}
+html.theme-light .toast.error {
+    background:   rgba(192,32,58,0.12) !important;
+    color:        var(--accent)         !important;
+    border:       1px solid var(--accent) !important;
+}
+
+/* Print dialog */
+html.theme-light #print-overlay {
+    background: rgba(0,0,0,0.45) !important;
+}
+html.theme-light #print-dialog {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .pd-title { color: var(--accent) !important; }
+html.theme-light .pd-group label { color: var(--text-secondary) !important; }
+html.theme-light .pd-group input,
+html.theme-light .pd-group select {
+    background:   var(--bg-primary)   !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+
+/* Bell */
+html.theme-light .bell-btn {
+    border-color: var(--border-color) !important;
+    color:        var(--text-secondary) !important;
+}
+html.theme-light .bell-btn:hover {
+    border-color: var(--accent) !important;
+}
+html.theme-light .bell-badge {
+    background: var(--accent) !important;
+    color:      #fff          !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   jspreadsheet light theme
+   ════════════════════════════════════════════════════════════════ */
+html.theme-light .jexcel_content {
+    background: var(--bg-primary) !important;
+}
+html.theme-light .jexcel > thead > tr > td {
+    background:   var(--bg-tertiary)  !important;
+    color:        var(--accent)       !important;
+    border-color: var(--border-color) !important;
+    font-weight:  600;
+}
+html.theme-light .jexcel > tbody > tr > td {
+    background:   var(--bg-primary)   !important;
+    color:        var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .jexcel > tbody > tr:hover > td {
+    background: var(--bg-secondary) !important;
+}
+html.theme-light .jexcel > tbody > tr > td.selected,
+html.theme-light .jexcel > tbody > tr > td.highlight {
+    background: #c8d4ee !important;
+    color:      var(--text-primary) !important;
+}
+html.theme-light .jexcel > tbody > tr > td.highlight-top    { border-top:    2px solid var(--accent) !important; }
+html.theme-light .jexcel > tbody > tr > td.highlight-bottom { border-bottom: 2px solid var(--accent) !important; }
+html.theme-light .jexcel > tbody > tr > td.highlight-left   { border-left:   2px solid var(--accent) !important; }
+html.theme-light .jexcel > tbody > tr > td.highlight-right  { border-right:  2px solid var(--accent) !important; }
+
+html.theme-light .jexcel > tbody > tr > td:first-child {
+    background:   var(--bg-tertiary)  !important;
+    color:        var(--text-muted)   !important;
+    border-right: 2px solid var(--accent) !important;
+}
+html.theme-light .jexcel_corner,
+html.theme-light .jexcel_selectall {
+    background:   var(--bg-tertiary)  !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .jexcel > tbody > tr > td.editor input,
+html.theme-light .jexcel > tbody > tr > td input,
+html.theme-light .jexcel > tbody > tr > td textarea {
+    color:        var(--text-primary) !important;
+    background:   #c8d4ee            !important;
+    caret-color:  var(--text-primary) !important;
+}
+html.theme-light .jexcel > thead > tr > td input {
+    color:      var(--accent)       !important;
+    background: var(--bg-tertiary)  !important;
+}
+
+/* Context menu */
+html.theme-light div.jexcel_contextmenu,
+html.theme-light div.jexcel_contextmenu div,
+html.theme-light div.jexcel_contextmenu span,
+html.theme-light div.jexcel_contextmenu a {
+    background-color: var(--bg-secondary) !important;
+    color:            var(--text-primary) !important;
+}
+html.theme-light div.jexcel_contextmenu {
+    border-color: var(--border-color)         !important;
+    box-shadow:   0 4px 16px rgba(0,0,0,0.15) !important;
+}
+html.theme-light div.jexcel_contextmenu div:hover {
+    background-color: var(--bg-tertiary) !important;
+    color:            var(--accent)      !important;
+}
+html.theme-light div.jexcel_contextmenu div[disabled],
+html.theme-light div.jexcel_contextmenu div.disabled {
+    color: var(--accent) !important;
+}
+html.theme-light div.jexcel_contextmenu hr {
+    border-color: var(--border-color) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SUPPORT CHAT
+   ════════════════════════════════════════════════════════════════ */
+html.theme-light .bubble.admin {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+html.theme-light .bubble.user {
+    background: var(--accent) !important;
+    color:      #ffffff       !important;
+}
+html.theme-light .input-bar {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .input-bar textarea {
+    background:   var(--bg-primary)   !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+html.theme-light .attach-label {
+    border-color: var(--border-color)   !important;
+    color:        var(--text-secondary) !important;
+}
+html.theme-light .attach-label:hover {
+    border-color: var(--accent) !important;
+    color:        var(--accent) !important;
+}
+html.theme-light .notice {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-muted)   !important;
+}
+html.theme-light .admin-label { color: var(--accent) !important; }
+html.theme-light .bubble-meta { color: var(--text-muted) !important; }
+html.theme-light .file-attachment {
+    background:   var(--bg-tertiary)  !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SESSION WARNING DIALOG
+   ════════════════════════════════════════════════════════════════ */
+html.theme-light #session-dialog {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--accent)       !important;
+}
+html.theme-light .sd-title   { color: var(--accent)         !important; }
+html.theme-light .sd-message { color: var(--text-secondary) !important; }
+html.theme-light .sd-sub     { color: var(--text-muted)     !important; }
+html.theme-light .sd-countdown { color: var(--accent)       !important; }
+html.theme-light .sd-btn-outline {
+    color:        var(--text-secondary) !important;
+    border-color: var(--border-color)   !important;
+}
+html.theme-light .sd-btn-outline:hover {
+    border-color: var(--accent) !important;
+    color:        var(--accent) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LOGIN / REGISTER PAGES
+   ════════════════════════════════════════════════════════════════ */
+html.theme-light .card h2 { color: var(--accent) !important; }
+html.theme-light .link a  { color: var(--accent) !important; }
+html.theme-light .back a  { color: var(--accent) !important; }
+html.theme-light .strength-label { filter: brightness(0.85); }
+
+/* ════════════════════════════════════════════════════════════════
+   TEMPLATE PICKER
+   ════════════════════════════════════════════════════════════════ */
+html.theme-light .template-card {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color:        var(--text-primary) !important;
+}
+html.theme-light .template-card:hover {
+    border-color: var(--accent) !important;
+}
+html.theme-light .template-card h3   { color: var(--text-primary)   !important; }
+html.theme-light .template-card p    { color: var(--text-muted)     !important; }
+html.theme-light .col-tag {
+    background:   var(--bg-tertiary)    !important;
+    color:        var(--text-secondary) !important;
+}
+html.theme-light .blank-btn {
+    border-color: var(--border-color)   !important;
+    color:        var(--text-muted)     !important;
+}
+html.theme-light .blank-btn:hover {
+    border-color: var(--accent) !important;
+    color:        var(--accent) !important;
+}
+html.theme-light .divider { color: var(--text-muted) !important; }
+
+/* ════════════════════════════════════════════════════════════════
+   SPREADSHEET DASHBOARD (Index)
+   ════════════════════════════════════════════════════════════════ */
+html.theme-light .grid .card {
+    background:   var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+html.theme-light .grid .card:hover {
+    border-color: var(--accent) !important;
+}
+html.theme-light .card-title { color: var(--text-primary) !important; }
+html.theme-light .card-date  { color: var(--text-muted)   !important; }
+html.theme-light .empty      { color: var(--text-muted)   !important; }
+html.theme-light .btn-success-sm {
+    color:        var(--success)    !important;
+    border-color: var(--success)    !important;
+}
+html.theme-light .btn-success-sm:hover {
+    background: var(--success) !important;
+    color:      #ffffff         !important;
+}

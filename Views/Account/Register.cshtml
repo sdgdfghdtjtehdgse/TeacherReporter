@@ -1,0 +1,245 @@
+@model TeacherReporter.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem('tr_theme') || 'dark';
+            document.documentElement.className = 'theme-' + t;
+        } catch(e) {}
+    })();
+</script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Register — TeacherReporter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            background: #16213e;
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #0f3460;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 8px;
+            color: #e94560;
+            font-size: 1.8rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 28px;
+            font-size: 0.9rem;
+        }
+        .form-group { margin-bottom: 18px; }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        input[type=text], input[type=email], input[type=password] {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1a1a2e;
+            border: 1px solid #0f3460;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus { border-color: #e94560; }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #c73652; }
+        .error {
+            background: #3a1a1a;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+        }
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+        .strength-bar-wrap {
+            height: 4px;
+            background: #0f3460;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s, background 0.3s;
+        }
+        .strength-label {
+            font-size: 0.72rem;
+            margin-top: 4px;
+            min-height: 14px;
+            transition: color 0.3s;
+        }
+        .link a { color: #e94560; text-decoration: none; }
+        .link a:hover { text-decoration: underline; }
+    </style>
+    <link rel="stylesheet" href="/css/themes.css"/>
+    <script src="/js/theme.js"></script>
+</head>
+<body>
+
+<script>
+    (function(){
+        var t = localStorage.getItem('tr_theme') || 'dark';
+        document.body.className = 'theme-' + t;
+    })();
+</script>
+
+<div class="card">
+    <h2>TeacherReporter</h2>
+    <p class="subtitle">Создайте новый аккаунт</p>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="error">
+            @foreach (var error in ViewData.ModelState.Values
+                          .SelectMany(v => v.Errors))
+            {
+                <div>@error.ErrorMessage</div>
+            }
+        </div>
+    }
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <label>Полное имя</label>
+            <input type="text" name="FullName" value="@Model?.FullName" placeholder="Анастасия Дмитриевна"/>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="Email" value="@Model?.Email" placeholder="teacher@spt.com"/>
+        </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input type="password" name="Password" id="reg-password"
+                   placeholder="••••••"
+                   oninput="checkStrength(this.value, 'reg')"/>
+            <div class="strength-bar-wrap">
+                <div class="strength-bar" id="reg-strength-bar"></div>
+            </div>
+            <div class="strength-label" id="reg-strength-label"></div>
+        </div>
+        <div class="form-group">
+            <label>Подтвердите пароль</label>
+            <input type="password" name="ConfirmPassword" placeholder="••••••"/>
+        </div>
+        <button type="submit" class="btn">Создать аккаунт</button>
+    </form>
+
+    <div class="link">
+        У вас уже есть аккаунт? <a href="/Account/Login">Войдите</a>
+    </div>
+</div>
+
+<script>
+    function checkStrength(password, prefix) {
+        var bar   = document.getElementById(prefix + '-strength-bar');
+        var label = document.getElementById(prefix + '-strength-label');
+        if (!bar || !label) return;
+
+        if (password.length === 0) {
+            bar.style.width = '0%';
+            label.textContent = '';
+            return;
+        }
+
+        var score = 0;
+        var tips  = [];
+
+        // Length checks
+        if (password.length >= 6)  score++;
+        if (password.length >= 10) score++;
+        if (password.length >= 14) score++;
+
+        // Character variety checks
+        if (/[a-z]/.test(password)) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^a-zA-Z0-9]/.test(password)) score++;
+
+        // Tip hints
+        if (password.length < 10)          tips.push('длиннее');
+        if (!/[A-Z]/.test(password))        tips.push('верхний регистр');
+        if (!/[0-9]/.test(password))        tips.push('числа');
+        if (!/[^a-zA-Z0-9]/.test(password)) tips.push('символы');
+
+        var pct, color, text;
+
+        if (score <= 2) {
+            pct = 20; color = '#ff4444'; text = '🔴 Слабый';
+        } else if (score <= 3) {
+            pct = 40; color = '#ff7700'; text = '🟠 Такой-се';
+        } else if (score <= 4) {
+            pct = 60; color = '#ffc857'; text = '🟡 Умеренный';
+        } else if (score <= 5) {
+            pct = 80; color = '#57c8ff'; text = '🔵 Сильный';
+        } else {
+            pct = 100; color = '#57ffb0'; text = '🟢 Очень сильный';
+        }
+
+        if (tips.length > 0 && score < 6)
+            text += '  · попробуйте добавить: ' + tips.join(', ');
+
+        bar.style.width      = pct + '%';
+        bar.style.background = color;
+        label.style.color    = color;
+        label.textContent    = text;
+    }
+</script>
+
+<div style="position:fixed; top:16px; right:16px;">
+    <button class="theme-toggle-btn"
+            onclick="toggleTheme()"
+            style="background:transparent; border:1px solid #0f3460;
+                   border-radius:8px; padding:6px 10px;
+                   cursor:pointer; font-size:1rem;"
+            title="Переключить тему">☀️</button>
+</div>
+
+</body>
+</html>

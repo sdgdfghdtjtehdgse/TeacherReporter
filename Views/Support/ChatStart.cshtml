@@ -1,0 +1,117 @@
+@{
+    ViewData["Title"] = "Support";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem('tr_theme') || 'dark';
+            document.documentElement.className = 'theme-' + t;
+        } catch(e) {}
+    })();
+</script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Support — TeacherReporter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .icon { font-size: 2.5rem; text-align: center; margin-bottom: 12px; }
+        h2 {
+            text-align: center;
+            color: #e94560;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; color: #aaa; font-size: 0.85rem; margin-bottom: 6px; }
+        input[type=email] {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1a1a2e;
+            border: 1px solid #0f3460;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        input[type=email]:focus { border-color: #e94560; }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .btn:hover { background: #c73652; }
+        .back {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.82rem;
+            color: #555;
+        }
+        .back a { color: #e94560; text-decoration: none; }
+    </style>
+    <link rel="stylesheet" href="/css/themes.css"/>
+    <script src="/js/theme.js"></script>
+</head>
+<body>
+
+<script>
+    (function(){
+        var t = localStorage.getItem('tr_theme') || 'dark';
+        document.body.className = 'theme-' + t;
+    })();
+</script>
+
+<div class="card">
+    <div class="icon">💬</div>
+    <h2>Чат поддержки</h2>
+    <p class="subtitle">
+        Введите адрес электронной почты, чтобы начать 
+        или продолжить диалог с администратором.
+    </p>
+    <form method="get" action="/Support/Chat">
+        <div class="form-group">
+            <label>Ваш адрес электронной почты</label>
+            <input type="email" name="email"
+                   placeholder="ваша@почта.ru" required/>
+        </div>
+        <button type="submit" class="btn">Открыть чат</button>
+    </form>
+    <div class="back">
+        <a href="/Account/Login">← Вернуться к входу</a>
+    </div>
+</div>
+</body>
+</html>

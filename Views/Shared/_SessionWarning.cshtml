@@ -1,0 +1,256 @@
+<!-- Session Timeout Warning Dialog -->
+<div id="session-overlay" style="display:none">
+    <div id="session-dialog">
+        <div class="sd-icon">⏱</div>
+        <div class="sd-title">Сессия скоро завершится</div>
+        <div class="sd-message">
+            Ваша сессия завершится через
+            <span id="session-countdown" class="sd-countdown">5:00</span>
+            из-за неактивности.
+        </div>
+        <div class="sd-message sd-sub">
+            Хотите остаться в системе?
+        </div>
+        <div class="sd-buttons">
+            <button class="sd-btn sd-btn-primary"
+                    onclick="extendSession()">
+                ✅ Остаться
+            </button>
+            <button class="sd-btn sd-btn-outline"
+                    onclick="logoutNow()">
+                🚪 Выйти сейчас
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    #session-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #session-dialog {
+        background: #16213e;
+        border: 1px solid #e94560;
+        border-radius: 14px;
+        padding: 36px 40px;
+        max-width: 420px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(233,69,96,0.3);
+        animation: sd-appear 0.3s ease;
+    }
+    @@keyframes sd-appear {
+        from { transform: scale(0.85); opacity: 0; }
+        to   { transform: scale(1);    opacity: 1; }
+    }
+    .sd-icon {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+    }
+    .sd-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #e94560;
+        margin-bottom: 12px;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .sd-message {
+        color: #aaa;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        font-family: 'Segoe UI', sans-serif;
+        line-height: 1.5;
+    }
+    .sd-sub { color: #666; font-size: 0.82rem; margin-bottom: 24px; }
+    .sd-countdown {
+        color: #e94560;
+        font-weight: 700;
+        font-size: 1.1rem;
+        font-family: monospace;
+    }
+    .sd-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .sd-btn {
+        padding: 10px 22px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-family: 'Segoe UI', sans-serif;
+        transition: background 0.2s, color 0.2s;
+    }
+    .sd-btn-primary {
+        background: #e94560;
+        color: white;
+    }
+    .sd-btn-primary:hover { background: #c73652; }
+    .sd-btn-outline {
+        background: transparent;
+        color: #aaa;
+        border: 1px solid #0f3460;
+    }
+    .sd-btn-outline:hover { border-color: #e94560; color: #e94560; }
+</style>
+
+<script>
+    // Session timeout settings (must match Program.cs)
+    var SESSION_MINUTES  = 60;   // total session duration
+    var WARNING_MINUTES  = 5;    // warn this many minutes before expiry
+    var sessionTimer     = null;
+    var countdownTimer   = null;
+    var sessionWarned    = false;
+
+    // Track last activity time
+    var lastActivity = Date.now();
+
+    // Reset activity timer on any user interaction
+    ['mousemove','keydown','mousedown','touchstart','scroll']
+        .forEach(function(evt) {
+            document.addEventListener(evt, function() {
+                lastActivity = Date.now();
+                // If warning is showing and user is active, hide it
+                if (sessionWarned) {
+                    var overlay = document.getElementById('session-overlay');
+                    if (overlay && overlay.style.display !== 'none') {
+                        // Don't hide automatically — let user click
+                    }
+                }
+            }, { passive: true });
+        });
+
+    function startSessionWatcher() {
+        // Check every 30 seconds
+        sessionTimer = setInterval(function() {
+            var idleMs      = Date.now() - lastActivity;
+            var idleMins    = idleMs / 60000;
+            var remaining   = SESSION_MINUTES - idleMins;
+
+            if (remaining <= 0) {
+                // Session has expired
+                clearInterval(sessionTimer);
+                clearInterval(countdownTimer);
+                window.location.href = '/Account/Login?reason=timeout';
+                return;
+            }
+
+            if (remaining <= WARNING_MINUTES && !sessionWarned) {
+                sessionWarned = true;
+                showSessionWarning(remaining);
+            }
+        }, 30000);
+    }
+
+    function showSessionWarning(remainingMins) {
+        var overlay = document.getElementById('session-overlay');
+        if (!overlay) return;
+        overlay.style.display = 'flex';
+
+        // Start countdown
+        var totalSecs = Math.floor(remainingMins * 60);
+        updateCountdown(totalSecs);
+
+        countdownTimer = setInterval(function() {
+            totalSecs--;
+            if (totalSecs <= 0) {
+                clearInterval(countdownTimer);
+                window.location.href = '/Account/Login?reason=timeout';
+                return;
+            }
+            updateCountdown(totalSecs);
+        }, 1000);
+    }
+
+    function updateCountdown(secs) {
+        var el = document.getElementById('session-countdown');
+        if (!el) return;
+        var m = Math.floor(secs / 60);
+        var s = secs % 60;
+        el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+
+        // Turn red when under 1 minute
+        el.style.color = secs < 60 ? '#ff4444' : '#e94560';
+    }
+
+    function extendSession() {
+        // POST to keep-alive endpoint to refresh the server session
+        fetch('/Account/KeepAlive', { method: 'POST' })
+            .then(function(res) {
+                if (res.ok) {
+                    // Reset everything
+                    clearInterval(countdownTimer);
+                    sessionWarned = false;
+                    lastActivity  = Date.now();
+
+                    var overlay = document.getElementById('session-overlay');
+                    if (overlay) overlay.style.display = 'none';
+
+                    showToastMsg('\u2705 Сессия продлена ещё на ' +
+                        SESSION_MINUTES + ' минут.');
+                } else {
+                    window.location.href = '/Account/Login';
+                }
+            })
+            .catch(function() {
+                window.location.href = '/Account/Login';
+            });
+    }
+
+    function logoutNow() {
+        clearInterval(sessionTimer);
+        clearInterval(countdownTimer);
+        // Submit the logout form
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Account/Logout';
+        var token   = document.querySelector(
+            'input[name="__RequestVerificationToken"]');
+        if (token) {
+            var inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = '__RequestVerificationToken';
+            inp.value = token.value;
+            form.appendChild(inp);
+        }
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function showToastMsg(msg) {
+        // Try to use existing toast if available (editor page)
+        var t = document.getElementById('toast');
+        if (t) {
+            t.textContent = msg;
+            t.classList.remove('error');
+            t.classList.add('show');
+            setTimeout(function(){ t.classList.remove('show'); }, 4000);
+            return;
+        }
+        // Fallback: simple notification
+        var n = document.createElement('div');
+        n.textContent = msg;
+        n.style.cssText =
+            'position:fixed;bottom:24px;right:24px;' +
+            'background:#1a3a2e;color:#57ffb0;' +
+            'border:1px solid #57ffb0;' +
+            'padding:12px 20px;border-radius:8px;' +
+            'font-family:Segoe UI,sans-serif;font-size:0.88rem;' +
+            'z-index:999998;box-shadow:0 4px 16px rgba(0,0,0,0.4);';
+        document.body.appendChild(n);
+        setTimeout(function(){ n.remove(); }, 4000);
+    }
+
+    // Add antiforgery token for KeepAlive POST
+    document.addEventListener('DOMContentLoaded', function() {
+        startSessionWatcher();
+    });
+</script>

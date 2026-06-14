@@ -1,0 +1,460 @@
+@model IEnumerable<TeacherReporter.Models.SupportMessage>
+@{
+    ViewData["Title"] = "Support Chat";
+    Layout = null;
+    var email = ViewBag.Email as string ?? "";
+    var threadId = ViewBag.ThreadId as string ?? "";
+    var lastId = Model.Any() ? Model.Max(m => m.Id) : 0;
+    TimeZoneInfo krasZone;
+    try { krasZone = TimeZoneInfo.FindSystemTimeZoneById("Russia TZ 6 Standard Time"); }
+    catch { try { krasZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Krasnoyarsk"); }
+    catch { krasZone = TimeZoneInfo.CreateCustomTimeZone("Krasnoyarsk",
+        TimeSpan.FromHours(7), "Krasnoyarsk Time", "Krasnoyarsk Standard Time"); } }
+    DateTime ToKras(DateTime utc) =>
+        TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.SpecifyKind(utc, DateTimeKind.Utc), krasZone);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem('tr_theme') || 'dark';
+            document.documentElement.className = 'theme-' + t;
+        } catch(e) {}
+    })();
+</script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Support Chat — TeacherReporter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .navbar {
+            background: #16213e;
+            border-bottom: 1px solid #0f3460;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .logo { color: #e94560; font-weight: bold; font-size: 1.1rem; }
+        .info { color: #666; font-size: 0.82rem; }
+        .btn-sm {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #0f3460;
+            color: #aaa;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+        .btn-sm:hover { border-color: #e94560; color: #e94560; }
+        .notice {
+            background: #16213e;
+            border-bottom: 1px solid #0f3460;
+            padding: 8px 24px;
+            font-size: 0.78rem;
+            color: #555;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .empty-msg {
+            text-align: center;
+            color: #555;
+            margin: auto;
+            font-size: 0.9rem;
+        }
+        .bubble-wrap {
+            display: flex;
+            flex-direction: column;
+            max-width: 70%;
+        }
+        .bubble-wrap.user { align-self: flex-end; align-items: flex-end; }
+        .bubble-wrap.admin { align-self: flex-start; align-items: flex-start; }
+        .bubble {
+            padding: 10px 16px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        .bubble.user {
+            background: #e94560;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .bubble.admin {
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-bottom-left-radius: 4px;
+        }
+        .bubble-meta { font-size: 0.7rem; color: #555; margin-top: 4px; padding: 0 4px; }
+        .admin-label {
+            font-size: 0.72rem;
+            color: #e94560;
+            font-weight: 600;
+            margin-bottom: 4px;
+            padding: 0 4px;
+        }
+        .file-attachment {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 6px;
+            text-decoration: none;
+            color: inherit;
+            font-size: 0.82rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.2s;
+        }
+        .file-attachment:hover { background: rgba(255,255,255,0.05); }
+        .file-icon { font-size: 1.2rem; }
+        .file-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+        .input-bar {
+            background: #16213e;
+            border-top: 1px solid #0f3460;
+            padding: 12px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .input-row { display: flex; gap: 10px; align-items: flex-end; }
+        .input-bar textarea {
+            flex: 1;
+            background: #1a1a2e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            padding: 10px 14px;
+            resize: none;
+            outline: none;
+            font-family: 'Segoe UI', sans-serif;
+            height: 44px;
+            max-height: 120px;
+        }
+        .input-bar textarea:focus { border-color: #e94560; }
+        .send-btn {
+            padding: 0 20px;
+            height: 44px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .send-btn:hover { background: #c73652; }
+        .attach-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .attach-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px dashed #0f3460;
+            border-radius: 6px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .attach-label:hover { border-color: #e94560; color: #e94560; }
+        .attach-label input { display: none; }
+        .file-preview {
+            font-size: 0.78rem;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .file-preview .remove {
+            color: #e94560;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .sending-indicator {
+            font-size: 0.75rem;
+            color: #666;
+            font-style: italic;
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="/css/themes.css"/>
+    <script src="/js/theme.js"></script>
+</head>
+<body>
+
+<script>
+    (function(){
+        var t = localStorage.getItem('tr_theme') || 'dark';
+        document.body.className = 'theme-' + t;
+    })();
+</script>
+
+<nav class="navbar">
+    <div class="logo">💬 Чат поддержки</div>
+    <div class="info">Вы вошли как: <strong>@email</strong></div>
+    <a href="/Account/Login" class="btn-sm">← Войти</a>
+</nav>
+
+<div class="notice">
+    Сообщения проверяются администратором. Время ответа может варьироваться.
+</div>
+
+<div class="messages" id="messages">
+    @if (!Model.Any())
+    {
+        <div class="empty-msg" id="empty-msg">
+            Сообщений пока нет. Отправьте сообщение ниже.
+        </div>
+    }
+    @foreach (var msg in Model)
+    {
+        if (msg.IsAdminReply)
+        {
+            <div class="bubble-wrap admin">
+                <div class="admin-label">🛡 Администратор</div>
+                <div class="bubble admin">
+                    @if (!string.IsNullOrEmpty(msg.Message))
+                    {
+                        @msg.Message
+                    }
+                    @if (!string.IsNullOrEmpty(msg.FileName))
+                    {
+                        <a class="file-attachment"
+                           href="/Support/Download?file=@msg.FileStoredName&name=@Uri.EscapeDataString(msg.FileName!)"
+                           target="_blank">
+                            <span class="file-icon">📎</span>
+                            <span class="file-name">@msg.FileName</span>
+                        </a>
+                    }
+                </div>
+                <div class="bubble-meta">
+                    @ToKras(msg.SentAt).ToString("dd MMM, HH:mm")
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="bubble-wrap user">
+                <div class="bubble user">
+                    @if (!string.IsNullOrEmpty(msg.Message))
+                    {
+                        @msg.Message
+                    }
+                    @if (!string.IsNullOrEmpty(msg.FileName))
+                    {
+                        <a class="file-attachment"
+                           href="/Support/Download?file=@msg.FileStoredName&name=@Uri.EscapeDataString(msg.FileName!)"
+                           target="_blank">
+                            <span class="file-icon">📎</span>
+                            <span class="file-name">@msg.FileName</span>
+                        </a>
+                    }
+                </div>
+                <div class="bubble-meta">
+                    @ToKras(msg.SentAt).ToString("dd MMM, HH:mm")
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div class="input-bar">
+    <div class="attach-row">
+        <label class="attach-label">
+            <span>📎</span> Прикрепить файл
+            <input type="file" id="fileInput"
+                   accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                   onchange="previewFile(this)"/>
+        </label>
+        <div class="file-preview" id="filePreview" style="display:none">
+            <span id="filePreviewName"></span>
+            <span class="remove" onclick="clearFile()">✕</span>
+        </div>
+        <span class="sending-indicator" id="sendingIndicator">Отправка...</span>
+    </div>
+    <div class="input-row">
+        <textarea id="messageInput"
+                  placeholder="Введите сообщение... (Нажмите Enter для отправки, Shift+Enter для переноса строки)"
+                  onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+</div>
+
+<script>
+    const EMAIL = '@Html.Raw(email)';
+    const THREAD_ID = '@Html.Raw(threadId)';
+    let lastId = @lastId;
+
+    function scrollToBottom() {
+        const m = document.getElementById('messages');
+        m.scrollTop = m.scrollHeight;
+    }
+    scrollToBottom();
+
+    function getFileIcon(mimeType) {
+        if (!mimeType) return '📎';
+        if (mimeType.startsWith('image/')) return '🖼';
+        if (mimeType === 'application/pdf') return '📄';
+        if (mimeType.includes('word')) return '📝';
+        if (mimeType.includes('excel') || mimeType.includes('sheet')) return '📊';
+        return '📎';
+    }
+
+    function buildBubble(msg) {
+        const wrap = document.createElement('div');
+        const isAdmin = msg.isAdminReply;
+        wrap.className = 'bubble-wrap ' + (isAdmin ? 'admin' : 'user');
+
+        let inner = '';
+        if (isAdmin) {
+            inner += '<div class="admin-label">🛡 Администратор</div>';
+        } else {
+            inner += `<div class="${isAdmin ? '' : 'user-label'}">👤</div>`;
+        }
+
+        inner += '<div class="bubble ' + (isAdmin ? 'admin' : 'user') + '">';
+
+        if (msg.message) {
+            inner += msg.message
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        if (msg.fileName) {
+            const icon = getFileIcon(msg.fileMimeType);
+            inner += `<a class="file-attachment"
+            href="/Support/Download?file=${encodeURIComponent(msg.fileStoredName)}&name=${encodeURIComponent(msg.fileName)}"
+            target="_blank">
+            <span class="file-icon">${icon}</span>
+            <span class="file-name">${msg.fileName.replace(/</g, '&lt;')}</span>
+        </a>`;
+        }
+
+        inner += '</div>';
+        inner += `<div class="bubble-meta">${msg.sentAt}</div>`;
+        wrap.innerHTML = inner;
+        return wrap;
+    }
+
+    async function sendMessage() {
+        const textarea = document.getElementById('messageInput');
+        const fileInput = document.getElementById('fileInput');
+        const text = textarea.value.trim();
+        const file = fileInput.files[0];
+
+        if (!text && !file) return;
+
+        document.getElementById('sendingIndicator').style.display = 'inline';
+
+        const formData = new FormData();
+        formData.append('email', EMAIL);
+        formData.append('threadId', THREAD_ID);
+        if (text) formData.append('message', text);
+        if (file) formData.append('attachment', file);
+
+        textarea.value = '';
+        clearFile();
+
+        try {
+            const res = await fetch('/Support/SendMessage', {
+                method: 'POST',
+                body: formData
+            });
+            if (!res.ok) throw new Error(await res.text());
+            const msg = await res.json();
+            lastId = msg.id;
+
+            const empty = document.getElementById('empty-msg');
+            if (empty) empty.remove();
+
+            document.getElementById('messages')
+                .appendChild(buildBubble(msg));
+            scrollToBottom();
+        } catch (e) {
+            alert('Ошибка отправки: ' + e.message);
+        } finally {
+            document.getElementById('sendingIndicator').style.display = 'none';
+        }
+    }
+
+    function handleKey(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    }
+
+    function previewFile(input) {
+        const preview = document.getElementById('filePreview');
+        const name = document.getElementById('filePreviewName');
+        if (input.files[0]) {
+            name.textContent = input.files[0].name;
+            preview.style.display = 'flex';
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+
+    function clearFile() {
+        document.getElementById('fileInput').value = '';
+        document.getElementById('filePreview').style.display = 'none';
+    }
+
+    // Poll for new messages every 4 seconds
+    setInterval(async function () {
+        try {
+            const res = await fetch(
+                `/Support/Poll?threadId=${encodeURIComponent(THREAD_ID)}&afterId=${lastId}`);
+            if (!res.ok) return;
+            const msgs = await res.json();
+            if (!msgs.length) return;
+            const empty = document.getElementById('empty-msg');
+            if (empty) empty.remove();
+            msgs.forEach(function (msg) {
+                document.getElementById('messages')
+                    .appendChild(buildBubble(msg));
+                lastId = msg.id;
+            });
+            scrollToBottom();
+        } catch (e) { /* silent fail */ }
+    }, 4000);
+</script>
+
+</body>
+</html>

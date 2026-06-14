@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem('tr_theme') || 'dark';
+            document.documentElement.className = 'theme-' + t;
+        } catch(e) {}
+    })();
+</script>
+    <meta charset="utf-8"/>
+    <title>Access Denied</title>
+    <style>
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        h1 { color: #e94560; font-size: 3rem; }
+        p { color: #888; margin-top: 12px; }
+        a { color: #e94560; }
+    </style>
+    <link rel="stylesheet" href="/css/themes.css"/>
+    <script src="/js/theme.js"></script>
+</head>
+<body>
+<div>
+    <h1>403</h1>
+    <p>У вас нет разрешения на просмотр этой страницы.</p>
+    <p><a href="/Account/Login">Вернуться к входу</a></p>
+</div>
+</body>
+</html>

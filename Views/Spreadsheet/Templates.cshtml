@@ -1,0 +1,259 @@
+@{
+    ViewData["Title"] = "Choose a Template";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem('tr_theme') || 'dark';
+            document.documentElement.className = 'theme-' + t;
+        } catch(e) {}
+    })();
+</script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Choose a Template — TeacherReporter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: #16213e;
+            border-bottom: 1px solid #0f3460;
+            padding: 14px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { color: #e94560; font-size: 1.3rem; font-weight: bold; }
+        .btn {
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-outline { background: transparent; color: #aaa; border: 1px solid #0f3460; }
+        .btn-outline:hover { border-color: #e94560; color: #e94560; }
+        .container {
+            max-width: 960px;
+            margin: 48px auto;
+            padding: 0 24px;
+            flex: 1;
+        }
+        .page-header { text-align: center; margin-bottom: 48px; }
+        .page-header h1 { font-size: 1.7rem; margin-bottom: 10px; }
+        .page-header p { color: #666; font-size: 0.9rem; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .template-card {
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 12px;
+            padding: 28px 24px;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.15s;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .template-card:hover {
+            border-color: #e94560;
+            transform: translateY(-3px);
+        }
+        .template-card .icon {
+            font-size: 2.4rem;
+            margin-bottom: 14px;
+            display: block;
+        }
+        .template-card h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+        .template-card p {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.5;
+        }
+        .template-card .preview {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+        }
+        .col-tag {
+            background: #0f3460;
+            color: #aaa;
+            font-size: 0.68rem;
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+        .divider {
+            text-align: center;
+            color: #555;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+        .blank-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 14px;
+            background: transparent;
+            border: 1px dashed #0f3460;
+            border-radius: 10px;
+            color: #555;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .blank-btn:hover { border-color: #e94560; color: #e94560; }
+    </style>
+    <link rel="stylesheet" href="/css/themes.css"/>
+    <script src="/js/theme.js"></script>
+</head>
+<body>
+
+<script>
+    (function(){
+        var t = localStorage.getItem('tr_theme') || 'dark';
+        document.body.className = 'theme-' + t;
+    })();
+</script>
+
+<nav class="navbar">
+    <div class="logo">📊 TeacherReporter</div>
+    <a href="/Spreadsheet" class="btn btn-outline">← Назад</a>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Выберите шаблон</h1>
+        <p>Начните с готового шаблона или создайте пустую таблицу</p>
+    </div>
+
+    <div class="grid">
+
+        <a class="template-card" href="/Spreadsheet/Editor?template=monthly">
+            <span class="icon">📅</span>
+            <h3>Ежемесячные оценки</h3>
+            <p>Отслеживайте оценки учеников по неделям с автоматическим расчётом среднего балла</p>
+            <div class="preview">
+                <span class="col-tag">Имя студента</span>
+                <span class="col-tag">Неделя 1</span>
+                <span class="col-tag">Неделя 2</span>
+                <span class="col-tag">Неделя 3</span>
+                <span class="col-tag">Неделя 4</span>
+                <span class="col-tag">Среднее</span>
+                <span class="col-tag">Пропущенные часы</span>
+            </div>
+        </a>
+
+        <a class="template-card" href="/Spreadsheet/Editor?template=semester">
+            <span class="icon">📚</span>
+            <h3>Отчет за семестр</h3>
+            <p>Полный обзор семестра по всем предметам и итоговая оценка</p>
+            <div class="preview">
+                <span class="col-tag">Имя студента</span>
+                <span class="col-tag">Математика</span>
+                <span class="col-tag">Наука</span>
+                <span class="col-tag">История</span>
+                <span class="col-tag">Литература</span>
+                <span class="col-tag">PE</span>
+                <span class="col-tag">Итоговая оценка</span>
+            </div>
+        </a>
+
+        <a class="template-card" href="/Spreadsheet/Editor?template=attendance">
+            <span class="icon">🗓️</span>
+            <h3>Журнал посещаемости</h3>
+            <p>Ежемесячный учёт посещаемости с подсчётом присутствий и отсутствий</p>
+            <div class="preview">
+                <span class="col-tag">Имя студента</span>
+                <span class="col-tag">Неделя 1</span>
+                <span class="col-tag">Неделя 2</span>
+                <span class="col-tag">Неделя 3</span>
+                <span class="col-tag">Неделя 4</span>
+                <span class="col-tag">Итог присутствующих</span>
+                <span class="col-tag">Итог отсутствующих</span>
+            </div>
+        </a>
+
+        <a class="template-card" href="/Spreadsheet/Editor?template=behavior">
+            <span class="icon">⭐</span>
+            <h3>Поведение и участие</h3>
+            <p>Отслеживайте поведение, участие и выполнение домашних заданий</p>
+            <div class="preview">
+                <span class="col-tag">Имя студента</span>
+                <span class="col-tag">Поведение</span>
+                <span class="col-tag">Участие</span>
+                <span class="col-tag">Домашнее задание</span>
+                <span class="col-tag">Примечания</span>
+            </div>
+        </a>
+
+        <a class="template-card" href="/Spreadsheet/Editor?template=exam">
+            <span class="icon">✏️</span>
+            <h3>Результаты экзаменов</h3>
+            <p>Запись результатов экзаменов с оценкой успеваемости</p>
+            <div class="preview">
+                <span class="col-tag">Имя студента</span>
+                <span class="col-tag">Счет</span>
+                <span class="col-tag">Максимальный балл</span>
+                <span class="col-tag">Процент</span>
+                <span class="col-tag">Оценка</span>
+                <span class="col-tag">Статус</span>
+            </div>
+        </a>
+
+        <a class="template-card" href="/Spreadsheet/Editor?template=yearly">
+            <span class="icon">📊</span>
+            <h3>Годовой обзор</h3>
+            <p>Оценки за все месяцы учебного года со средним годовым баллом</p>
+            <div class="preview">
+                <span class="col-tag">Имя студента</span>
+                <span class="col-tag">Сен</span>
+                <span class="col-tag">Окт</span>
+                <span class="col-tag">Ноя</span>
+                <span class="col-tag">Дек</span>
+                <span class="col-tag">Янв</span>
+                <span class="col-tag">Фев</span>
+                <span class="col-tag">Мар</span>
+                <span class="col-tag">Апр</span>
+                <span class="col-tag">Май</span>
+                <span class="col-tag">Среднегодовое значение</span>
+            </div>
+        </a>
+
+    </div>
+
+    <div class="divider">— или —</div>
+    <a href="/Spreadsheet/Editor" class="blank-btn">+ Начать с пустой таблицы</a>
+</div>
+
+@await Html.PartialAsync("_SessionWarning")
+
+</body>
+</html>

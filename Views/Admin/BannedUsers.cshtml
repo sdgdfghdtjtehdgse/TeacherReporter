@@ -1,0 +1,227 @@
+@model IEnumerable<TeacherReporter.Models.BannedUser>
+@{
+    ViewData["Title"] = "Banned Users";
+    Layout = null;
+    TimeZoneInfo krasZone;
+    try { krasZone = TimeZoneInfo.FindSystemTimeZoneById("Russia TZ 6 Standard Time"); }
+    catch { try { krasZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Krasnoyarsk"); }
+        catch { krasZone = TimeZoneInfo.CreateCustomTimeZone("Krasnoyarsk",
+            TimeSpan.FromHours(7), "Krasnoyarsk Time", "Krasnoyarsk Standard Time"); } }
+    DateTime ToKras(DateTime utc) =>
+        TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.SpecifyKind(utc, DateTimeKind.Utc), krasZone);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem('tr_theme') || 'dark';
+            document.documentElement.className = 'theme-' + t;
+        } catch(e) {}
+    })();
+</script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Banned Users — TeacherReporter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #16213e;
+            border-bottom: 1px solid #0f3460;
+            padding: 14px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { color: #e94560; font-size: 1.3rem; font-weight: bold; }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-outline { background: transparent; color: #aaa; border: 1px solid #0f3460; }
+        .btn-outline:hover { border-color: #e94560; color: #e94560; }
+        .btn-success {
+            background: #1a3a2e;
+            color: #57ffb0;
+            border: 1px solid #57ffb0;
+            font-size: 0.8rem;
+            padding: 5px 12px;
+        }
+        .btn-success:hover { background: #57ffb0; color: #1a1a2e; }
+        .container { max-width: 1000px; margin: 36px auto; padding: 0 24px; }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .page-header h1 { font-size: 1.4rem; }
+        .success-msg {
+            background: #1a3a2e;
+            border: 1px solid #57ffb0;
+            color: #57ffb0;
+            padding: 10px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        thead tr {
+            background: #16213e;
+            border-bottom: 2px solid #0f3460;
+        }
+        thead th {
+            padding: 12px 14px;
+            text-align: left;
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .unread-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #e94560;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 20px;
+            padding: 0 5px;
+            margin-left: 4px;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        tbody tr { border-bottom: 1px solid #0f3460; transition: background 0.15s; }
+        tbody tr:hover { background: #16213e; }
+        tbody td { padding: 12px 14px; vertical-align: middle; }
+        .ip-text { font-family: monospace; color: #888; font-size: 0.82rem; }
+        .empty { text-align: center; color: #555; padding: 60px 0; font-size: 1rem; }
+        form { display: inline; }
+    </style>
+    <link rel="stylesheet" href="/css/themes.css"/>
+    <script src="/js/theme.js"></script>
+</head>
+<body>
+
+<script>
+    (function(){
+        var t = localStorage.getItem('tr_theme') || 'dark';
+        document.body.className = 'theme-' + t;
+    })();
+</script>
+
+
+<nav class="navbar">
+    <div class="logo">📊 TeacherReporter</div>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <button class="theme-toggle-btn btn btn-outline"
+                onclick="toggleTheme()" title="Переключить тему">☀️</button>
+        <a href="/Admin/Support" class="btn btn-outline">
+            💬 Поддержка
+            @if (ViewBag.UnreadSupportCount > 0)
+            {
+                <span class="unread-badge">@ViewBag.UnreadSupportCount</span>
+            }
+        </a>
+        <a href="/Admin" class="btn btn-outline">← Панель администратора</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Заблокированные пользователи</h1>
+        <span style="color:#666; font-size:0.85rem;">@Model.Count() блокировок всего</span>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="success-msg">✅ @TempData["Success"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="empty">Заблокированных пользователей нет.</div>
+    }
+    else
+    {
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Почта</th>
+                <th>IP адрес</th>
+                <th>Причина</th>
+                <th>Дата блокировки (Красноярск)</th>
+                <th>Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var ban in Model)
+            {
+                <tr>
+                    <td style="color:#555;">@ban.Id</td>
+                    <td>@ban.Email</td>
+                    <td><span class="ip-text">@(ban.IpAddress ?? "—")</span></td>
+                    <td style="color:#888;">@(ban.Reason ?? "—")</td>
+                    <td>@ToKras(ban.BannedAt).ToString("dd MMM yyyy, HH:mm")</td>
+                    <td>
+                        <form method="post" action="/Admin/UnbanUser"
+                              onsubmit="return confirm('Разбанить @ban.Email? он сможет зарегистрироваться снова.')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="banId" value="@ban.Id"/>
+                            <button type="submit" class="btn btn-success">✅ Разблокировать</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+<script>
+    setInterval(async function () {
+        try {
+            const res = await fetch('/Admin/UnreadCount');
+            if (!res.ok) return;
+            const data = await res.json();
+            document.querySelectorAll('.unread-badge')
+                .forEach(function (b) { b.remove(); });
+            if (data.count > 0) {
+                document.querySelectorAll('a[href="/Admin/Support"]')
+                    .forEach(function (link) {
+                        const badge = document.createElement('span');
+                        badge.className = 'unread-badge';
+                        badge.textContent = data.count;
+                        link.appendChild(badge);
+                    });
+            }
+        } catch (e) { }
+    }, 10000);
+</script>
+
+@await Html.PartialAsync("_SessionWarning")
+
+</body>
+</html>

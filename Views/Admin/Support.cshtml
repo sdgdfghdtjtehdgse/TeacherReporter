@@ -1,0 +1,235 @@
+@model IEnumerable<TeacherReporter.ViewModels.SupportThreadViewModel>
+@{
+    ViewData["Title"] = "Support Inbox";
+    Layout = null;
+    TimeZoneInfo krasZone;
+    try { krasZone = TimeZoneInfo.FindSystemTimeZoneById("Russia TZ 6 Standard Time"); }
+    catch { try { krasZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Krasnoyarsk"); }
+        catch { krasZone = TimeZoneInfo.CreateCustomTimeZone("Krasnoyarsk",
+            TimeSpan.FromHours(7), "Krasnoyarsk Time", "Krasnoyarsk Standard Time"); } }
+    DateTime ToKras(DateTime utc) =>
+        TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.SpecifyKind(utc, DateTimeKind.Utc), krasZone);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    (function(){
+        try {
+            var t = localStorage.getItem('tr_theme') || 'dark';
+            document.documentElement.className = 'theme-' + t;
+        } catch(e) {}
+    })();
+</script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Support Inbox — TeacherReporter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #16213e;
+            border-bottom: 1px solid #0f3460;
+            padding: 14px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { color: #e94560; font-size: 1.3rem; font-weight: bold; }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-block;
+            border: 1px solid #0f3460;
+            color: #aaa;
+            background: transparent;
+            cursor: pointer;
+        }
+        .btn:hover { border-color: #e94560; color: #e94560; }
+        .btn-danger {
+            background: #3a1a1a;
+            color: #e94560;
+            border: 1px solid #e94560;
+            font-size: 0.8rem;
+            padding: 5px 12px;
+        }
+        .btn-danger:hover { background: #e94560; color: white; }
+        .container { max-width: 900px; margin: 36px auto; padding: 0 24px; }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .page-header h1 { font-size: 1.4rem; }
+        .success-msg {
+            background: #1a3a2e;
+            border: 1px solid #57ffb0;
+            color: #57ffb0;
+            padding: 10px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+        .thread-list { display: flex; flex-direction: column; gap: 12px; }
+        .thread-card {
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 10px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.2s;
+        }
+        .thread-card:hover { border-color: #e94560; }
+        .thread-card.unread { border-left: 3px solid #e94560; }
+        .thread-info { flex: 1; }
+        .thread-email {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #e0e0e0;
+        }
+        .thread-preview {
+            font-size: 0.8rem;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 500px;
+        }
+        .thread-meta {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .thread-time { font-size: 0.75rem; color: #555; margin-bottom: 6px; }
+        .unread-badge {
+            background: #e94560;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .thread-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .empty { text-align: center; color: #555; padding: 60px 0; }
+        form { display: inline; }
+    </style>
+    <link rel="stylesheet" href="/css/themes.css"/>
+    <script src="/js/theme.js"></script>
+</head>
+<body>
+
+<script>
+    (function(){
+        var t = localStorage.getItem('tr_theme') || 'dark';
+        document.body.className = 'theme-' + t;
+    })();
+</script>
+
+<nav class="navbar">
+    <div class="logo">📊 TeacherReporter</div>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <span style="color:#666; font-size:0.82rem;" id="unread-indicator">
+            @if (ViewBag.UnreadSupportCount > 0)
+            {
+                <span style="color:#e94560; font-weight:600;">
+                    @ViewBag.UnreadSupportCount unread
+                </span>
+            }
+            else
+            {
+                <span>Всё прочитано ✓</span>
+            }
+        </span>
+        <button class="theme-toggle-btn btn btn-outline"
+                onclick="toggleTheme()" title="Toggle Theme">☀️</button>
+        <a href="/Admin" class="btn">← Панель администратора</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1>💬 Входящие обращения</h1>
+        <span style="color:#666; font-size:0.85rem;">
+            @Model.Count() обращений
+        </span>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="success-msg">✅ @TempData["Success"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="empty">Обращений пока нет.</div>
+    }
+    else
+    {
+        <div class="thread-list">
+            @foreach (var thread in Model)
+            {
+                <div class="thread-card @(thread.UnreadCount > 0 ? "unread" : "")">
+                    <div class="thread-info">
+                        <div class="thread-email">@thread.Email</div>
+                        <div class="thread-preview">@thread.LastMessage</div>
+                    </div>
+                    <div class="thread-meta">
+                        <div class="thread-time">
+                            @ToKras(thread.LastMessageAt).ToString("dd MMM, HH:mm")
+                        </div>
+                        @if (thread.UnreadCount > 0)
+                        {
+                            <span class="unread-badge">@thread.UnreadCount новых</span>
+                        }
+                    </div>
+                    <div class="thread-actions">
+                        <a href="/Admin/SupportThread?threadId=@Uri.EscapeDataString(thread.ThreadId)"
+                           class="btn">Открыть</a>
+                        <form method="post" action="/Admin/DeleteThread"
+                              onsubmit="return confirm('Удалить этот диалог?')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="threadId" value="@thread.ThreadId"/>
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+<script>
+    setInterval(async function () {
+        try {
+            const res = await fetch('/Admin/UnreadCount');
+            if (!res.ok) return;
+            const data = await res.json();
+            const indicator = document.getElementById('unread-indicator');
+            if (!indicator) return;
+            if (data.count > 0) {
+                indicator.innerHTML =
+                    `<span style="color:#e94560; font-weight:600;">
+                        ${data.count} unread
+                    </span>`;
+            } else {
+                indicator.innerHTML =
+                    '<span>Всё прочитано ✓</span>';
+            }
+        } catch (e) { }
+    }, 10000);
+</script>
+
+@await Html.PartialAsync("_SessionWarning")
+
+</body>
+</html>
