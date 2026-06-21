@@ -9,10 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<TeacherReporter.Data.SupportService>();
 
-// Add MySQL Database
+// Add SQLite Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    options.UseSqlite(connectionString)
 );
 
 // Add Identity (login/register/roles)
