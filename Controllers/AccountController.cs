@@ -38,7 +38,7 @@ namespace TeacherReporter.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null && !user.IsActive)
+            if (user != null && user.IsActive)
             {
                 ModelState.AddModelError("",
                     "Ваш аккаунт деактивирован. Свяжитесь с администратором.");
@@ -118,7 +118,7 @@ namespace TeacherReporter.Controllers
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "Teacher");
+                await _userManager.AddToRoleAsync(user, "Teachers");
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToAction("Index", "Spreadsheet");
             }

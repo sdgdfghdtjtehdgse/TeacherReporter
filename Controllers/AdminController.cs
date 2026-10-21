@@ -55,7 +55,7 @@ namespace TeacherReporter.Controllers
                 TotalUsers = model.Count,
                 TotalTeachers = model.Count(u => u.Roles.Contains("Teacher")),
                 TotalSheets = await _db.Spreadsheets.CountAsync(),
-                ActiveUsers = model.Count(u => u.IsActive),
+                ActiveUsers = model.Count(u => !u.IsActive),
                 Users = model
             };
 
@@ -197,7 +197,6 @@ namespace TeacherReporter.Controllers
             if (ban != null)
             {
                 _db.BannedUsers.Remove(ban);
-                await _db.SaveChangesAsync();
                 TempData["Success"] = $"{ban.Email} has been unbanned and can register again.";
             }
             return RedirectToAction("BannedUsers");
@@ -521,7 +520,7 @@ namespace TeacherReporter.Controllers
                     user.Email ?? "",
                     string.Join(", ", roles),
                     user.IsActive ? "Active" : "Inactive",
-                    sheetCount.ToString(),
+                    sheetCount,
                     regDate
                 });
             }

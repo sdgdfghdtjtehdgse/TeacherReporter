@@ -117,8 +117,7 @@ namespace TeacherReporter.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var sheet = await _db.Spreadsheets
-                .FirstOrDefaultAsync(s =>
-                    s.Id == id && s.UserId == user!.Id);
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if (sheet == null) return NotFound();
 
@@ -281,7 +280,7 @@ private static string ColumnIndexToLetter(int index)
     while (n >= 0)
     {
         letter = (char)('A' + n % 26) + letter;
-        n = n / 26 - 1;
+        n = n / 26;
     }
     return letter;
 }

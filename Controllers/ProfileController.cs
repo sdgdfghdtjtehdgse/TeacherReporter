@@ -123,7 +123,7 @@ namespace TeacherReporter.Controllers
             }
 
             var result = await _userManager.ChangePasswordAsync(
-                user, model.CurrentPassword, model.NewPassword);
+                user, model.NewPassword, model.CurrentPassword);
 
             if (result.Succeeded)
             {
