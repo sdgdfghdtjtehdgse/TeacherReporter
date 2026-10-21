@@ -57,9 +57,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthentication();
-app.UseMiddleware<TeacherReporter.Data.ActiveUserMiddleware>();
 app.UseAuthorization();
+app.UseMiddleware<TeacherReporter.Data.ActiveUserMiddleware>();
+app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "areas",

@@ -14,7 +14,7 @@ namespace TeacherReporter.Data
         public async Task<int> GetUnreadCountAsync()
         {
             return await _db.SupportMessages
-                .CountAsync(m => !m.IsAdminReply && !m.IsRead);
+                .CountAsync(m => m.IsAdminReply && !m.IsRead);
         }
     }
 }

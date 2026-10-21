@@ -460,7 +460,7 @@ function colorCodeCell(cell, value) {
     cell.style.removeProperty('color');
     cell.style.removeProperty('font-weight');
     if (isNaN(num) || String(value).trim() === '') return;
-    if (num <= 2) {
+    if (num <= 3) {
         cell.style.setProperty('color', '#ff4444', 'important');
         cell.style.setProperty('font-weight', '600', 'important');
     } else if (num === 3) {

@@ -137,7 +137,7 @@ namespace TeacherReporter.Controllers
             {
                 SenderEmail = email,
                 Message = message?.Trim(),
-                IsAdminReply = false,
+                IsAdminReply = true,
                 SentAt = DateTime.UtcNow,
                 ThreadId = threadId,
                 IsRead = false,
